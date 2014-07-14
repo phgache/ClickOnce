@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <BuildEnvironment>Production</BuildEnvironment>
+        <BuildEnvironment>PreProduction</BuildEnvironment>
+        <BuildEnvironment>Qualification</BuildEnvironment>
+        <BuildEnvironment>Developpement</BuildEnvironment>
+    </PropertyGroup>
+ 
+    <Choose>
+        <When Condition=" '$(BuildEnvironment)' == 'Production' ">
+          <PropertyGroup>
+            <PublishDir>C:\ClickOnce\Production\</PublishDir>
+            <PublishUrl>$(PublishDir)</PublishUrl>
+            <InstallUrl>http://deployserver/Production/</InstallUrl>
+			<PublisherName>Publisher</PublisherName>
+			<ProductName>ClickOnce Production</ProductName>
+          </PropertyGroup>
+        </When>
+        <When Condition=" '$(BuildEnvironment)' == 'PreProduction' ">
+          <PropertyGroup>
+            <PublishDir>C:\ClickOnce\PreProduction\</PublishDir>
+            <PublishUrl>$(PublishDir)</PublishUrl>
+            <InstallUrl>http://deployserver/PreProduction/</InstallUrl>
+			<PublisherName>Publisher</PublisherName>
+			<ProductName>ClickOnce PreProduction</ProductName>
+          </PropertyGroup>
+        </When>
+        <When Condition=" '$(BuildEnvironment)' == 'Qualification' ">
+          <PropertyGroup>
+            <PublishDir>C:\ClickOnce\Qualification\</PublishDir>
+            <PublishUrl>$(PublishDir)</PublishUrl>
+            <InstallUrl>http://deployserver/Qualification/</InstallUrl>
+			<PublisherName>Publisher</PublisherName>
+			<ProductName>ClickOnce Qualification</ProductName>
+          </PropertyGroup>
+        </When>
+        <When Condition=" '$(BuildEnvironment)' == 'Developpement' ">
+          <PropertyGroup>
+            <PublishDir>C:\ClickOnce\Developpement\</PublishDir>
+            <PublishUrl>$(PublishDir)</PublishUrl>
+            <InstallUrl>http://deployserver/Developpement/</InstallUrl>
+			<PublisherName>Publisher</PublisherName>
+			<ProductName>ClickOnce Developpement</ProductName>
+          </PropertyGroup>
+        </When>  
+    </Choose>
+     
+    <PropertyGroup>
+        <!-- Note this must be done AFTER the above Choose (so PublishDir is set)-->
+        <PublishFilePath>$(PublishDir)Publish.htm</PublishFilePath>
+    </PropertyGroup>
+ 
+    <ItemGroup>
+        <Tokens Include="PublisherName">
+          <ReplacementValue>$(PublisherName)</ReplacementValue>
+          <Visible>false</Visible>
+        </Tokens>
+        <Tokens Include="ProductName">
+          <ReplacementValue>$(ProductName)</ReplacementValue>
+          <Visible>false</Visible>
+        </Tokens>
+        <Tokens Include="ApplicationVersion">
+          <ReplacementValue>$(ApplicationVersion)</ReplacementValue>
+          <Visible>false</Visible>
+        </Tokens>
+        <Tokens Include="Prerequsites">
+          <ReplacementValue>@(BootstrapperPackage->'&lt;li&gt;%(ProductName)&lt;/li&gt;','%0D%0A')</ReplacementValue>
+          <Visible>false</Visible>
+        </Tokens>
+        <Tokens Include="Username">
+          <ReplacementValue>$(Username)</ReplacementValue>
+          <Visible>false</Visible>
+        </Tokens>
+    </ItemGroup>
+ 
+    <Target Name="AfterPublish">
+        <Time Format="dd/MM/yyyy HH:mm">
+          <Output TaskParameter="FormattedTime" PropertyName="PublishTime" />
+        </Time>
+        <TemplateFile Template="Publish\Publish.htm" Tokens="@(Tokens)" OutputFilename="$(PublishFilePath)" />
+        <FileUpdate Files="$(PublishFilePath)" Regex="\${PublishTime}" ReplacementText="$(PublishTime)" />
+    </Target>
+ 
+</Project>
